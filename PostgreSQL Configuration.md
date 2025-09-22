@@ -190,8 +190,14 @@ docker exec postgres-config df -h
 ### บันทึกผลการทดลอง
 ```
 1. อธิบายหน้าที่คำสั่ง docker exec postgres-config free, docker exec postgres-config df
+แสดงสรุปการใช้ RAM/Swap และ disk space แบบอ่านง่าย
+
 2. option -h ในคำสั่งมีผลอย่างไร
+-h = human-readable
+แปลงหน่วยเป็น KB/MB/GB อ่านง่าย
+
 3. docker exec postgres-config nproc  แสดงค่าผลลัพธ์อย่างไร
+nตัวเลขจำนวน CPU ที่คอนเทนเนอร์เห็น (เช่น 2)
 ```
 #### 1.2 เชื่อมต่อและตรวจสอบสถานะปัจจุบัน
 ```bash
@@ -210,7 +216,10 @@ SHOW data_directory;
 ### บันทึกผลการทดลอง
 ```
 1. ตำแหน่งที่อยู่ของไฟล์ configuration อยู่ที่ตำแหน่งใด
+/var/lib/postgresql/data/postgresql.conf
+
 2. ตำแหน่งที่อยู่ของไฟล์ data อยู่ที่ตำแหน่งใด
+/var/lib/postgresql/data
 ```
 -- ตรวจสอบการตั้งค่าปัจจุบัน
 SELECT name, setting, unit, category, short_desc 
@@ -222,7 +231,9 @@ WHERE name IN (
 ```
 ### บันทึกผลการทดลอง
 ```
-บันทึกรูปผลของ configuration ทั้ง 6 ค่า 
+บันทึกรูปผลของ configuration ทั้ง 6 ค่า
+<img width="1000" height="286" alt="ภาพถ่ายหน้าจอ 2568-09-22 เวลา 23 25 45" src="https://github.com/user-attachments/assets/57390737-6d81-4593-902b-f2f7d21bcca6" />
+
 ```
 
 ### Step 2: การปรับแต่งพารามิเตอร์แบบค่อยเป็นค่อยไป
@@ -237,8 +248,14 @@ WHERE name = 'shared_buffers';
 ### ผลการทดลอง
 ```
 1.รูปผลการรันคำสั่ง
+<img width="1005" height="96" alt="ภาพถ่ายหน้าจอ 2568-09-22 เวลา 23 26 23" src="https://github.com/user-attachments/assets/68615839-ba27-44a0-b765-cfab55c2a7b0" />
+
 2. ค่า  shared_buffers มีการกำหนดค่าไว้เท่าไหร่ (ใช้ setting X unit)
+setting = 16384 unit = 8KB
+= 131072KB = 128MB
+
 3. ค่า  pending_restart ในผลการทดลองมีค่าเป็นอย่างไร และมีความหมายอย่างไร
+f ความหมาย คือ ค่า 128MB ของ shared_buffers ใช้งานได้ทันที โดยไม่ต้อง restart.
 ```
 -- คำนวณและตั้งค่าใหม่
 -- สำหรับระบบ 2GB: 512MB (25%)
@@ -258,6 +275,8 @@ docker exec -it -u postgres postgres-config pg_ctl restart -D /var/lib/postgresq
 ```
 รูปผลการเปลี่ยนแปลงค่า pending_restart
 รูปหลังจาก restart postgres
+<img width="883" height="526" alt="ภาพถ่ายหน้าจอ 2568-09-22 เวลา 23 27 37" src="https://github.com/user-attachments/assets/745350c0-7a2f-4005-9bcf-f6682be3334f" />
+
 
 ```
 
@@ -282,6 +301,8 @@ WHERE name = 'work_mem';
 ### ผลการทดลอง
 ```
 รูปผลการเปลี่ยนแปลงค่า work_mem
+<img width="596" height="625" alt="ภาพถ่ายหน้าจอ 2568-09-22 เวลา 23 28 32" src="https://github.com/user-attachments/assets/0dd34b4a-cbd6-4ed7-acdd-ed0790ce1dc8" />
+
 ```
 
 #### 3.3 ปรับแต่ง Maintenance Work Memory
@@ -299,6 +320,8 @@ SHOW maintenance_work_mem;
 ### ผลการทดลอง
 ```
 รูปผลการเปลี่ยนแปลงค่า maintenance_work_mem
+<img width="738" height="438" alt="ภาพถ่ายหน้าจอ 2568-09-22 เวลา 23 29 00" src="https://github.com/user-attachments/assets/0ab326ce-dd17-4f0f-87e9-fc0dde5ae53e" />
+
 ```
 
 #### 3.4 ปรับแต่ง WAL Buffers
@@ -324,6 +347,8 @@ SHOW wal_buffers;
 ### ผลการทดลอง
 ```
 รูปผลการเปลี่ยนแปลงค่า wal_buffers
+<img width="616" height="508" alt="ภาพถ่ายหน้าจอ 2568-09-22 เวลา 23 29 34" src="https://github.com/user-attachments/assets/b780f644-713a-404e-a53f-2f04c22515bc" />
+
 ```
 
 #### 3.5 ปรับแต่ง Effective Cache Size
@@ -341,6 +366,8 @@ SHOW effective_cache_size;
 ### ผลการทดลอง
 ```
 รูปผลการเปลี่ยนแปลงค่า effective_cache_size
+<img width="733" height="437" alt="ภาพถ่ายหน้าจอ 2568-09-22 เวลา 23 30 08" src="https://github.com/user-attachments/assets/ff14bce2-6725-4d72-b103-a4fb33059c33" />
+
 ```
 
 ### Step 4: ตรวจสอบผล
@@ -370,6 +397,8 @@ ORDER BY name;
 ### ผลการทดลอง
 ```
 รูปผลการลัพธ์การตั้งค่า
+<img width="1004" height="245" alt="ภาพถ่ายหน้าจอ 2568-09-22 เวลา 23 32 57" src="https://github.com/user-attachments/assets/09fbc286-5596-49e6-a126-6b975ffb4852" />
+
 ```
 
 ### Step 5: การสร้างและทดสอบ Workload
